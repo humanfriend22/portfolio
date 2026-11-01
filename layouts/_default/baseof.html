@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Locale }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} — {{ site.Title }}{{ end }}</title>
+{{ with .Params.summary }}<meta name="description" content="{{ . }}">{{ end }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+{{ $sheets := slice }}
+{{ range slice "theme" "base" "components" "syntax" "transitions" }}{{ $sheets = $sheets | append (resources.Get (printf "css/%s.css" .)) }}{{ end }}
+{{ $css := $sheets | resources.Concat "css/site.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+</head>
+<body>
+{{ partial "header.html" . }}
+<main class="wrap page">
+{{ block "main" . }}{{ end }}
+</main>
+{{ partial "footer.html" . }}
+<script>
+(function () {
+  var header = document.querySelector('.site-header');
+  var button = header.querySelector('.menu-button');
+  function set(open) {
+    header.toggleAttribute('data-open', open);
+    button.setAttribute('aria-expanded', open);
+    button.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  }
+  button.addEventListener('click', function () { set(!header.hasAttribute('data-open')); });
+  header.addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+  header.querySelectorAll('.mobile-nav a').forEach(function (a) {
+    a.addEventListener('click', function () { set(false); });
+  });
+})();
+</script>
+</body>
+</html>

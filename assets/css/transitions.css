@@ -1,0 +1,14 @@
+/* Page transitions and reduced-motion overrides. Loaded last so the overrides win. */
+
+/* Smooth in-page scrolling (the contact link jumps to a home page section) */
+html { scroll-behavior: smooth; }
+
+/* Fade between pages in browsers that support cross-document view transitions */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.18s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

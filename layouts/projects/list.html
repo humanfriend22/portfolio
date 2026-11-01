@@ -1,0 +1,29 @@
+{{ define "main" }}
+{{ if eq .Parent.Section "projects" }}
+<h1 class="page-title">{{ .Title }}</h1>
+<div class="project-meta">
+{{ with .Params.year }}<span>{{ . }}</span><span aria-hidden="true">·</span>{{ end }}
+{{ range .Params.stack }}<code class="chip">{{ . }}</code>{{ end }}
+{{ with .Params.repo }}<span aria-hidden="true">·</span><a class="link accent-link" href="{{ . }}">GitHub repo</a>{{ end }}
+{{ with .Params.site }}<span aria-hidden="true">·</span><a class="link accent-link" href="{{ . }}">Live site</a>{{ end }}
+</div>
+{{ with .Params.summary }}<blockquote class="quote">{{ . }}</blockquote>{{ end }}
+{{ .Content }}
+{{ with .RegularPages.ByDate.Reverse }}
+<h2 id="devlog" class="section-heading">Devlog</h2>
+<ol class="timeline">
+{{ range . }}
+<li class="entry" id="{{ .File.ContentBaseName }}">
+<div class="entry-date"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time></div>
+<div class="entry-body">
+<h3>{{ .Title }}</h3>
+<div class="entry-text">{{ .Content }}</div>
+</div>
+</li>
+{{ end }}
+</ol>
+{{ end }}
+{{ else }}
+{{ .Content }}
+{{ end }}
+{{ end }}

@@ -1,0 +1,56 @@
+baseURL = ''
+locale = 'en-us'
+title = 'Saketh'
+
+# No tag/category pages or feeds: this site is just pages and projects
+disableKinds = ['taxonomy', 'term', 'rss']
+
+[params]
+  github = 'https://github.com/humanfriend22'
+  email = 'csakethc@gmail.com'
+
+[markup.goldmark.renderer]
+  # Lets shortcodes (::columns, cards, ...) emit HTML around markdown
+  unsafe = true
+
+[markup.highlight]
+  noClasses = false
+
+# Header links. Edit here to add or reorder pages.
+[[menus.main]]
+  name = 'about'
+  url = '/about/'
+  weight = 1
+[[menus.main]]
+  name = 'projects'
+  url = '/projects/'
+  weight = 2
+[[menus.main]]
+  name = 'school'
+  url = '/school/'
+  weight = 3
+[[menus.main]]
+  name = 'deda'
+  url = '/deda/'
+  weight = 4
+[[menus.main]]
+  name = 'resume'
+  url = '/resume/'
+  weight = 5
+[[menus.main]]
+  name = 'contact'
+  url = '/#contact'
+  weight = 6
+[[menus.main]]
+  name = 'github'
+  url = 'https://github.com/humanfriend22'
+  weight = 7
+
+# Devlog entries live next to their project's _index.md and are shown on that page,
+# so they don't get pages of their own.
+[[cascade]]
+  [cascade.build]
+    render = 'never'
+    list = 'local'
+  [cascade.target]
+    path = '/projects/*/*'

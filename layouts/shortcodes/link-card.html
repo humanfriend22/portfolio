@@ -1,0 +1,5 @@
+{{- /* {{< link-card href="/school/" title="School" >}}One line.{{< /link-card >}} */ -}}
+<a class="card" href="{{ .Get "href" | relURL }}">
+<span class="card-title">{{ .Get "title" }} →</span>
+<span class="card-summary">{{ .Inner | markdownify }}</span>
+</a>
