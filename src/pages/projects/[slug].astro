@@ -4,29 +4,19 @@ import Layout from '../../layouts/Layout.astro';
 import Gallery from '../../components/Gallery.astro';
 import { externalAttrs } from '../../lib/external';
 import Tag from '../../components/Tag.astro';
-import { imageList, isPage, isoDate, slugOf } from '../../lib/projects';
+import { imageList, isPage, slugOf } from '../../lib/projects';
 
 export async function getStaticPaths() {
-  const entries = await getCollection('devlog');
-  return (await getCollection('projects')).filter(isPage).map((project) => ({
-    params: { slug: slugOf(project) },
-    props: {
-      project,
-      devlog: entries
-        .filter((e) => e.id.startsWith(`${slugOf(project)}/`))
-        .sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
-    },
-  }));
+  return (await getCollection('projects')).filter(isPage).map((project) => ({ params: { slug: slugOf(project) }, props: { project } }));
 }
 
-const { project, devlog } = Astro.props;
+const { project } = Astro.props;
 const { data } = project;
 const { Content } = await render(project);
-const rendered = await Promise.all(devlog.map(async (e) => ({ entry: e, Body: (await render(e)).Content })));
 ---
-<Layout title={data.title} description={data.summary}>
+<Layout title={data.title} description={data.summary} indent={data.indent}>
   <h1 class="page-title">{data.title}</h1>
-  <div class="project-meta">
+  <div class="project-meta not-prose">
     {data.year && <><span>{data.year}</span><span aria-hidden="true">·</span></>}
     {data.stack.map((s) => <Tag name={s} />)}
     {data.repo && <><span aria-hidden="true">·</span><a class="link accent-link" href={data.repo} {...externalAttrs(data.repo)}>GitHub repo</a></>}
@@ -35,20 +25,4 @@ const rendered = await Promise.all(devlog.map(async (e) => ({ entry: e, Body: (a
   {data.summary && <blockquote class="quote">{data.summary}</blockquote>}
   <Content />
   {Array.isArray(data.image) && <Gallery images={imageList(project)} alt={data.title} />}
-  {rendered.length > 0 && (
-    <>
-      <h2 id="devlog" class="section-heading">Devlog</h2>
-      <ol class="timeline">
-        {rendered.map(({ entry, Body }) => (
-          <li class="entry" id={entry.id.split('/').slice(1).join('/')}>
-            <div class="entry-date"><time datetime={isoDate(entry.data.date)}>{isoDate(entry.data.date)}</time></div>
-            <div class="entry-body">
-              <h3>{entry.data.title}</h3>
-              <div class="entry-text"><Body /></div>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </>
-  )}
 </Layout>

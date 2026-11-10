@@ -1,7 +1,8 @@
 ---
 // <ProjectCards folder="notable" ids="macha" exclude="mcsd" cols={3} title="Heading" />: linked cards. folder / ids / exclude each take one value, "a, b", or {['a', 'b']} and combine. See also Projects.
-import { isPage, listProjects, type List } from '../lib/projects';
-import ProjectCard from './ProjectCard.astro';
+import { cardProps, isPage, listProjects, type List } from '../lib/projects';
+import Grid from './Grid.astro';
+import Card from './Card.astro';
 
 interface Props { ids?: List; folder?: List; exclude?: List; featured?: boolean; cols?: number; title?: string }
 const { ids, folder, exclude, featured = false, cols, title } = Astro.props;
@@ -11,8 +12,8 @@ const slug = title?.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 {list.length > 0 && (
   <>
     {title && <h2 id={slug} class="section-heading">{title}</h2>}
-    <div class={featured ? 'card-column' : cols ? 'card-grid card-grid-fixed' : 'card-grid'} style={cols ? `--cols:${cols}` : undefined}>
-      {list.map((p) => <ProjectCard project={p} {featured} />)}
-    </div>
+    <Grid cols={featured ? 1 : cols}>
+      {list.map((p) => <Card {...cardProps(p)} {featured}>{p.data.summary}</Card>)}
+    </Grid>
   </>
 )}

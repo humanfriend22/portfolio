@@ -1,9 +1,0 @@
----
-interface Props { title: string; type?: string; date?: string }
-const { title, type, date } = Astro.props;
----
-<div class="card card-static">
-  {(type || date) && <span class="card-meta">{type && <code class="chip">{type}</code>}{date && <time>{date}</time>}</span>}
-  <span class="card-title">{title}</span>
-  <div class="card-summary"><slot /></div>
-</div>

@@ -8,40 +8,35 @@ const files = import.meta.glob<ImageMetadata>('/src/content/**/*.{png,jpg,jpeg,w
   import: 'default',
 });
 
-// An image plus an optional trim, ready to spread onto <Image {...imgProps(pic)} />
-export type Pic = { src: ImageMetadata; width: number; height: number; position: string };
+// An image plus an optional trim, ready to spread onto <Image {...imgProps(pic)} />.
+// width/height are the size after trimming; crop is "left,top,right,bottom" percentages (see lib/crop-service.ts).
+export type Pic = { src: ImageMetadata; width: number; height: number; crop?: string };
 
-export const plain = (src: ImageMetadata): Pic => ({ src, width: src.width, height: src.height, position: 'center' });
+export const plain = (src: ImageMetadata): Pic => ({ src, width: src.width, height: src.height });
 
-// "mentor1?bottom=25&left=10": remove that percentage from the named edges. Only one edge per axis, so the crop is a plain
-// anchored box (removing the bottom keeps the top, and so on). Returns [name, trim].
-function parseRef(ref: string): [string, { top: number; bottom: number; left: number; right: number }] {
+// "mentor1?bottom=25&left=10": remove that percentage from the named edges (top, bottom, left, right; any combination).
+// Returns [name, [left, top, right, bottom]].
+function parseRef(ref: string): [string, number[]] {
   const [name, query = ''] = ref.split('?');
   const q = new URLSearchParams(query);
-  const trim = { top: 0, bottom: 0, left: 0, right: 0 };
-  for (const edge of Object.keys(trim) as (keyof typeof trim)[]) {
-    const v = Number(q.get(edge) ?? 0);
-    if (!(v >= 0 && v < 100)) throw new Error(`image "${ref}": ${edge} must be a percentage from 0 to 99`);
-    trim[edge] = v / 100;
-  }
-  if ((trim.top && trim.bottom) || (trim.left && trim.right)) throw new Error(`image "${ref}": trim only one of top/bottom and one of left/right`);
-  return [name, trim];
+  const [l, t, r, b] = ['left', 'top', 'right', 'bottom'].map((edge) => Number(q.get(edge) ?? 0));
+  const bad = ![l, t, r, b].every((v) => v >= 0 && v < 100) || l + r >= 100 || t + b >= 100;
+  if (bad) throw new Error(`image "${ref}": edges must be percentages from 0 to 99, and opposite edges must add up to less than 100`);
+  return [name, [l, t, r, b]];
 }
 
-function trimmed(src: ImageMetadata, trim: ReturnType<typeof parseRef>[1]): Pic {
-  // Keep the opposite side: trimming the bottom anchors the crop at the top
-  const v = trim.bottom ? 'top' : trim.top ? 'bottom' : '';
-  const h = trim.right ? 'left' : trim.left ? 'right' : '';
+function trimmed(src: ImageMetadata, [l, t, r, b]: number[]): Pic {
+  if (!(l || t || r || b)) return plain(src);
   return {
     src,
-    width: Math.round(src.width * (1 - trim.left - trim.right)),
-    height: Math.round(src.height * (1 - trim.top - trim.bottom)),
-    position: [v, h].filter(Boolean).join(' ') || 'center',
+    width: Math.round(src.width * (1 - (l + r) / 100)),
+    height: Math.round(src.height * (1 - (t + b) / 100)),
+    crop: [l, t, r, b].join(','),
   };
 }
 
-// Props for astro:assets <Image>: crops to the trimmed box when there is one
-export const imgProps = (p: Pic) => ({ src: p.src, width: p.width, height: p.height, fit: 'cover' as const, position: p.position });
+// Props for astro:assets <Image>
+export const imgProps = (p: Pic) => ({ src: p.src, width: p.width, height: p.height, crop: p.crop });
 
 // `from` is the project-relative path of the .md file that names the image (entry.filePath).
 export function resolveImage(ref: string, from: string): Pic {

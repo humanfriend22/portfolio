@@ -1,0 +1,97 @@
+{
+  "Accordion": {
+    "scope": "mdx",
+    "prefix": "Accordion",
+    "body": [
+      "<Accordion title=\"${1:Title}\">",
+      "$0",
+      "</Accordion>"
+    ]
+  },
+  "ProjectCards": {
+    "scope": "mdx",
+    "prefix": "ProjectCards",
+    "body": [
+      "<ProjectCards ids=\"${1}\" cols={${2:3}} title=\"${3:Projects}\" />"
+    ],
+    "description": "Also: folder=\"deda\", exclude=\"...\", featured"
+  },
+  "Projects": {
+    "scope": "mdx",
+    "prefix": "Projects",
+    "body": [
+      "<Projects folder=\"${1:deda}\" cols={${2:1}} align=\"${3|horizontal,vertical|}\" />"
+    ]
+  },
+  "Links": {
+    "scope": "mdx",
+    "prefix": "Links",
+    "body": [
+      "<Links title=\"${1:Links}\" />"
+    ]
+  },
+  "Divider": {
+    "scope": "mdx",
+    "prefix": "Divider",
+    "body": [
+      "<Divider />"
+    ]
+  },
+  "Chip": {
+    "scope": "mdx",
+    "prefix": "Chip",
+    "body": [
+      "<Chip>${1}</Chip>"
+    ]
+  },
+  "Card": {
+    "scope": "mdx",
+    "prefix": "Card",
+    "body": [
+      "<Card title=\"${1:Title}\" subtitle=\"${2}\" date=\"${3}\" image=\"${4}\" href=\"${5}\" align=\"${6|vertical,horizontal|}\">",
+      "$0",
+      "</Card>"
+    ],
+    "description": "title is the only required prop; anything left out is not shown"
+  },
+  "Grid": {
+    "scope": "mdx",
+    "prefix": "Grid",
+    "body": [
+      "<Grid cols={${1:2}}>",
+      "$0",
+      "</Grid>"
+    ],
+    "description": "Children in a grid; cols is optional"
+  },
+  "Grid (split with ---)": {
+    "scope": "mdx",
+    "prefix": [
+      "GridSplit",
+      "cols"
+    ],
+    "body": [
+      "<Grid widths=\"${1:3 2}\">",
+      "$2",
+      "",
+      "---",
+      "",
+      "$0",
+      "</Grid>"
+    ],
+    "description": "Uneven columns; a line with --- starts the next cell"
+  },
+  "Card (image beside text)": {
+    "scope": "mdx",
+    "prefix": [
+      "CardMedia",
+      "Media"
+    ],
+    "body": [
+      "<Card image=\"${1:image}\" align=\"horizontal\" side=\"${2|left,right|}\" bare>",
+      "$0",
+      "</Card>"
+    ],
+    "description": "Plain image beside some text, no box"
+  }
+}

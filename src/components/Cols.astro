@@ -1,8 +1,0 @@
----
-// <Cols widths={[3, 2]}><Column>…</Column><Column>…</Column></Cols>: columns that stack on mobile. widths are optional fr tracks.
-interface Props { widths?: number[]; cols?: number }
-const { widths = [], cols } = Astro.props;
-const tracks = widths.map((w) => `minmax(0, ${w}fr)`).join(' ');
-const style = `--cols:${cols ?? (widths.length || 2)}` + (tracks ? `;--tracks:${tracks}` : '');
----
-<div class="columns" style={style}><slot /></div>

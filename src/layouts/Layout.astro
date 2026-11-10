@@ -1,16 +1,21 @@
 ---
+import '../styles/global.css';
 import '../styles/theme.css';
 import '../styles/base.css';
 import '../styles/components.css';
 import '../styles/transitions.css';
-import { site } from '../data/site';
+import { menu, site } from '../data/site';
+import { externalAttrs } from '../lib/external';
 import { pathWithoutBase, url } from '../lib/url';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 
-interface Props { title?: string; description?: string }
-const { title, description } = Astro.props;
-const isHome = pathWithoutBase(Astro.url.pathname) === '/';
+interface Props { title?: string; description?: string; indent?: boolean }
+const { title, description, indent = false } = Astro.props;
+
+const cur = pathWithoutBase(Astro.url.pathname);
+const isHome = cur === '/';
+const parts = cur.split('/').filter(Boolean); // breadcrumbs
+const isProjectPage = /^\/projects\/[^/]+\//.test(cur);
+const isActive = (href: string) => !href.includes('#') && !href.startsWith('http') && cur.startsWith(href);
 ---
 <!doctype html>
 <html lang={site.locale}>
@@ -27,10 +32,61 @@ const isHome = pathWithoutBase(Astro.url.pathname) === '/';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
   </head>
   <body>
-    <Header />
-    <main class="wrap page"><slot /></main>
+    <header class="site-header wrap">
+      <div class="header-row">
+        <a href={url('/')} class="crumbs">
+          <span>humanfriend22</span>
+          {isHome ? (
+            <><span aria-hidden="true">/</span><span class="current">README.md</span></>
+          ) : (
+            parts.map((p, i) => (
+              <>
+                <span aria-hidden="true">/</span>
+                {i === parts.length - 1 ? <span class="current">{p}.md</span> : <span>{p}</span>}
+              </>
+            ))
+          )}
+        </a>
+        <nav class="desktop-nav" aria-label="Main">
+          {menu.map((m) => <a href={url(m.url)} class={isActive(m.url) ? 'active' : undefined} {...externalAttrs(m.url)}>{m.name}</a>)}
+        </nav>
+        <button type="button" class="menu-button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+          <svg class="icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <nav class="mobile-nav" id="mobile-nav" aria-label="Main">
+        <div class="mobile-nav-clip">
+          <div class="mobile-nav-grid">
+            {menu.map((m) => <a href={url(m.url)} class={isActive(m.url) ? 'active' : undefined} {...externalAttrs(m.url)}>{m.name}</a>)}
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class:list={['wrap page prose', { '[--indent:2em]': indent }]}><slot /></main>
     <dialog class="modal" aria-label="Project"><button class="modal-close" aria-label="Close">&times;</button><div class="modal-body page"></div></dialog>
-    <Footer />
+    <footer class="site-footer wrap">
+      <hr />
+      <div class="footer-row">
+        {isProjectPage ? <a class="link" href={url('/projects/')}>← all projects</a> : <span>© {new Date().getFullYear()} {site.title}</span>}
+        <a class="link" href={site.github} {...externalAttrs(site.github)}>github.com/humanfriend22</a>
+      </div>
+    </footer>
+
+    <script>
+      const header = document.querySelector<HTMLElement>('.site-header')!;
+      const button = header.querySelector<HTMLButtonElement>('.menu-button')!;
+
+      function set(open: boolean) {
+        header.toggleAttribute('data-open', open);
+        button.setAttribute('aria-expanded', String(open));
+        button.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      }
+
+      button.addEventListener('click', () => set(!header.hasAttribute('data-open')));
+      header.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false); });
+      header.querySelectorAll('.mobile-nav a').forEach((a) => a.addEventListener('click', () => set(false)));
+    </script>
 
     <script>
       // Cards marked data-modal open the project in a dialog on desktop; on mobile (or with a modifier key) they navigate normally.

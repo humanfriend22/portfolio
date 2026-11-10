@@ -47,6 +47,12 @@ export function isPage(p: Project) {
   return !INLINE_ONLY.includes(folderOf(p));
 }
 
+// Props for <Card> from a project: <Card {...cardProps(p)}>{p.data.summary}</Card>
+export function cardProps(p: Project) {
+  const [cover] = imageList(p);
+  return { title: p.data.title, href: projectHref(p), image: cover, tags: p.data.stack, modal: p.data.modal };
+}
+
 export function projectHref(p: Project) {
   return `/projects/${slugOf(p)}/`;
 }
@@ -79,10 +85,6 @@ const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString('en
 
 export function formatDate(d: Date) {
   return fmt(d, { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-export function isoDate(d: Date) {
-  return d.toISOString().slice(0, 10);
 }
 
 // "Nov 13 – Nov 26, 2023" | "Jan 1, 2023 – Feb 2, 2024" | "Jan 1, 2023 – present" | the year

@@ -2,10 +2,10 @@
 title: "Mycorrhizae Timelapse"
 summary: "Six Raspberry Pi cameras that photograph plants every three hours and publish a daily timelapse."
 stack: [Raspberry Pi, Python, HTML, Cron]
-year: "2023"
 repo: https://github.com/dhs-envirotech/timelapse
 date: 2024-01-18
 course: "Environmental Sustainability"
+indent: true
 ---
 
 ## Overview

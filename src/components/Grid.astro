@@ -1,0 +1,13 @@
+---
+// <Grid cols={3}> anything... </Grid>: children in a grid, one column on mobile. cols fixes the column count (empty slots stay
+// empty); without it the grid fits as many 320px columns as the width allows. Use it for <Card>s, images, or Markdown blocks.
+// <Grid widths="3 2"> text --- more text </Grid>: uneven columns; a line with --- starts the next cell (see plugins/layouts.mjs).
+// gap: space between cells in px (default 16).
+interface Props { cols?: number; widths?: number[] | string; gap?: number }
+const { cols, widths: raw = [], gap } = Astro.props;
+const widths = (typeof raw === 'string' ? raw.split(/[\s,]+/).map(Number) : raw).filter((n) => n > 0);
+const count = cols ?? (widths.length || undefined);
+const tracks = widths.map((w) => `minmax(0, ${w}fr)`).join(' ');
+const style = [count ? `--cols:${count}` : '', tracks ? `--tracks:${tracks}` : '', gap !== undefined ? `gap:${gap}px` : ''].filter(Boolean).join(';') || undefined;
+---
+<div class:list={['layout-grid', { 'layout-grid-fixed': count }]} style={style}><slot /></div>

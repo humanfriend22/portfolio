@@ -22,6 +22,8 @@ const project = {
   // One name is the cover. A list is a gallery: the first is the cover, the rest are shown under the write-up.
   image: z.union([z.string(), z.array(z.string())]).optional(),
   modal: z.boolean().default(false),
+  // Indent the first line of every paragraph that follows another paragraph (essay style)
+  indent: z.boolean().default(false),
 };
 
 // Projects: any .md under src/content/projects. The folder it sits in groups it for the ProjectCards / Projects
@@ -38,12 +40,6 @@ const projects = defineCollection({
   schema: z.object(project).superRefine(checkDates),
 });
 
-// Devlog entries: src/content/devlog/<project-slug>/<yyyy-mm-dd-name>.md, shown on that project's page
-const devlog = defineCollection({
-  loader: glob({ pattern: '*/*.md', base: './src/content/devlog' }),
-  schema: z.object({ title: z.string(), date: z.coerce.date() }),
-});
-
 // Pages: <name>.md(x) is /<name>/. index is the home page. Use .mdx to import components.
 const pages = defineCollection({
   // deda/index.mdx -> /deda/
@@ -52,7 +48,7 @@ const pages = defineCollection({
     base: './src/content/pages',
     generateId: ({ entry }) => entry.replace(/\.mdx?$/, '').replace(/(^|\/)index$/, '') || 'index',
   }),
-  schema: z.object({ title: z.string() }),
+  schema: z.object({ title: z.string(), indent: z.boolean().default(false) }),
 });
 
-export const collections = { projects, devlog, pages };
+export const collections = { projects, pages };

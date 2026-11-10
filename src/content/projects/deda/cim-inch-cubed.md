@@ -8,11 +8,12 @@ stack: [Fusion 360, 3D printing]
 course: "Computer Integrated Manufacturing"
 start: 9/15/2026
 end: 12/19/2026
+indent: true
 ---
 
-<p class="indent">
-    The goal of the Inch Cubed Project was to 3D print a design of our choosing using only 1in^3 worth of material.
-</p>
+
+The goal of the Inch Cubed Project was to 3D print a design of our choosing using only 1in^3 worth of material.
+
 
 For my project, I chose to model the Burj Khalifa. I started by importing a picture of the floor plan into Fusion 360 on which I traced a sketch of every floor. Then, I extruded each section to the height I needed and used a parameter to tweak the heights quickly. To save on material, I hollowed out the bottom layers as well as a cylinder about halfway up the model. Finally, once printed, the model came out to be 5.874”x1.539”x1.378”. While Fusion predicted the volume of the model to be 0.936 in^3, the 3D printing software estimated 1.565in^3.
 

@@ -3,11 +3,10 @@ title: "ArcGIS Hawaii Research"
 image: arcgis2
 summary: "An ArcGIS study of volcano hazard zones and emergency shelters in Hawaii."
 stack: [ArcGIS]
-year: "2023"
-date: 2023-11-26
 course: "Environmental Sustainability"
 start: 2023-11-13
 end: 2023-11-26
+indent: true
 ---
 
 <p class="indent">

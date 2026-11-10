@@ -1,31 +1,38 @@
 ---
-// <Projects folder="deda" format="alternating" cols={2} image="top" title="Projects" />
+// <Projects folder="deda" cols={1} align="horizontal" alternate title="Projects" />
+// Projects shown in full on this page, one card each: title, dates, course, links, images, and the whole write-up.
 //   folder / ids / exclude: which projects (same as ProjectCards)
-//   format: sections (full write-up inline, default) | alternating (one per row, image and text swap sides) | cards (linked cards)
-//   cols: projects per row on desktop (sections format, default 1)
-//   image: top (default) | none
-import { isPage, listProjects, type List } from '../lib/projects';
-import ProjectCard from './ProjectCard.astro';
-import ProjectSection from './ProjectSection.astro';
+//   cols: cards per row on desktop (default 1)   align: horizontal (default, image beside the text) | vertical
+//   alternate: swap the image side on every other card (default on, horizontal only)
+import { render } from 'astro:content';
+import { imageList, listProjects, projectDates, projectHref, isPage, slugOf, type List } from '../lib/projects';
+import Grid from './Grid.astro';
+import Card from './Card.astro';
 
 interface Props {
-  ids?: List; folder?: List; exclude?: List; title?: string;
-  format?: 'sections' | 'alternating' | 'cards'; cols?: number; image?: 'top' | 'none';
+  ids?: List; folder?: List; exclude?: List; title?: string; cols?: number;
+  align?: 'horizontal' | 'vertical'; alternate?: boolean;
 }
-const { ids, folder, exclude, title, format = 'sections', cols = 1, image = 'top' } = Astro.props;
+const { ids, folder, exclude, title, cols = 1, align = 'horizontal', alternate = true } = Astro.props;
 const list = await listProjects({ ids, folder, exclude });
+const items = await Promise.all(list.map(async (p) => ({ p, Content: (await render(p)).Content })));
 const slug = title?.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-const alt = format === 'alternating';
+
+const linksOf = (p: (typeof list)[number]) => [
+  ...(p.data.repo ? [{ text: 'GitHub repo', href: p.data.repo }] : []),
+  ...(isPage(p) ? [{ text: 'Project page', href: projectHref(p) }] : []),
+];
 ---
-{list.length > 0 && (
+{items.length > 0 && (
   <>
     {title && <h2 id={slug} class="section-heading">{title}</h2>}
-    {format === 'cards' ? (
-      <div class="card-grid">{list.filter(isPage).map((p) => <ProjectCard project={p} />)}</div>
-    ) : (
-      <div class:list={['project-sections', { 'project-sections-alt': alt }]} style={`--cols:${alt ? 1 : cols}`}>
-        {list.map((p) => <ProjectSection project={p} {image} alternate={alt} />)}
-      </div>
-    )}
+    <Grid {cols} gap={32}>
+      {items.map(({ p, Content }, i) => (
+        <Card
+          id={slugOf(p)} title={p.data.title} date={projectDates(p.data)} subtitle={p.data.course} links={linksOf(p)}
+          image={imageList(p)} {align} side={alternate && i % 2 ? 'right' : 'left'} indent={p.data.indent || undefined} prose
+        ><Content /></Card>
+      ))}
+    </Grid>
   </>
 )}
