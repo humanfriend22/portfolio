@@ -1,0 +1,26 @@
+---
+// Title, dates and links row at the top of an inline project section.
+import { isPage, projectDates, projectHref, type Project } from '../lib/projects';
+import { externalAttrs } from '../lib/external';
+import { url } from '../lib/url';
+
+interface Props { project: Project }
+const { project: p } = Astro.props;
+const dates = projectDates(p.data);
+const repo = p.data.repo;
+const page = isPage(p) ? url(projectHref(p)) : undefined;
+const parts = [p.data.course, repo, page].filter(Boolean).length;
+---
+<div class="project-section-head">
+  <h3 class="project-section-title">{p.data.title}</h3>
+  {dates && <time class="project-section-date">{dates}</time>}
+</div>
+{parts > 0 && (
+  <div class="project-meta">
+    {p.data.course && <span>{p.data.course}</span>}
+    {p.data.course && (repo || page) && <span aria-hidden="true">·</span>}
+    {repo && <a class="link accent-link" href={repo} {...externalAttrs(repo)}>GitHub repo</a>}
+    {repo && page && <span aria-hidden="true">·</span>}
+    {page && <a class="link accent-link" href={page}>Project page</a>}
+  </div>
+)}

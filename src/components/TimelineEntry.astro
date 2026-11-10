@@ -1,0 +1,21 @@
+---
+// <TimelineEntry date="2026-09-19" title="Name" subtitle="..." image="davemaino">text</TimelineEntry>: image is an image name without extension, optional (a placeholder shows until you add one).
+import { Image } from 'astro:assets';
+import { findImage, imgProps, plain } from '../lib/images';
+import placeholder from '../assets/placeholder.svg';
+import { formatDate } from '../lib/projects';
+
+interface Props { title: string; date?: string; subtitle?: string; image?: string }
+const { title, date, subtitle, image } = Astro.props;
+---
+<li class="entry entry-person">
+  <Image class="entry-image" {...imgProps(image ? findImage(image) : plain(placeholder))} alt={title} widths={[300, 600]} sizes="(min-width: 768px) 300px, 100vw" />
+  <div class="entry-body">
+    <div class="entry-head">
+      <h3>{title}</h3>
+      {date && <time class="entry-date" datetime={date}>{formatDate(new Date(date))}</time>}
+    </div>
+    {subtitle && <span class="entry-subtitle">{subtitle}</span>}
+    <div class="entry-text"><slot /></div>
+  </div>
+</li>

@@ -1,0 +1,45 @@
+---
+// One project rendered inline as a section. alternate: image beside the text instead of between the title and text.
+import { render } from 'astro:content';
+import { imageList, slugOf, type Project } from '../lib/projects';
+import { Image } from 'astro:assets';
+import placeholder from '../assets/placeholder.svg';
+import { imgProps, plain } from '../lib/images';
+import Gallery from './Gallery.astro';
+import ProjectHead from './ProjectHead.astro';
+
+interface Props { project: Project; image?: 'top' | 'none'; alternate?: boolean }
+const { project: p, image = 'top', alternate = false } = Astro.props;
+const { Content } = await render(p);
+// First image is the main one. Remaining images stack directly under it.
+const [main, ...extra] = imageList(p);
+const pic = main ?? plain(placeholder);
+const img = image !== 'none';
+---
+<article class:list={['project-section', { 'project-alt': alternate }]} id={slugOf(p)}>
+  {alternate ? (
+    <>
+      {img && (
+        <div class="project-section-media">
+          <Image class="project-section-image" {...imgProps(pic)} alt={p.data.title} widths={[640, 1280]} sizes="(min-width: 768px) 600px, 100vw" />
+          <Gallery images={extra} alt={p.data.title} />
+        </div>
+      )}
+      <div class="project-section-text">
+        <ProjectHead project={p} />
+        <div class="project-section-body"><Content /></div>
+      </div>
+    </>
+  ) : (
+    <>
+      <ProjectHead project={p} />
+      {img && (
+        <div class="project-section-media">
+          <Image class="project-section-image" {...imgProps(pic)} alt={p.data.title} widths={[640, 1280]} sizes="(min-width: 768px) 600px, 100vw" />
+          <Gallery images={extra} alt={p.data.title} />
+        </div>
+      )}
+      <div class="project-section-body"><Content /></div>
+    </>
+  )}
+</article>

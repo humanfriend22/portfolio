@@ -1,0 +1,13 @@
+---
+// Vertical list of images from a project's `image` front matter list. Renders nothing if empty.
+import { Image } from 'astro:assets';
+import { imgProps, type Pic } from '../lib/images';
+
+interface Props { images: Pic[]; alt: string }
+const { images, alt } = Astro.props;
+---
+{images.length > 0 && (
+  <div class="gallery">
+    {images.map((src) => <Image {...imgProps(src)} alt={alt} widths={[640, 1280]} sizes="(min-width: 768px) 700px, 100vw" />)}
+  </div>
+)}

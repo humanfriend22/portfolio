@@ -1,0 +1,48 @@
+---
+// <LatestDevlog count={3} title="Latest devlog" />: newest devlog entries across all projects; renders nothing if there are none
+import { getCollection } from 'astro:content';
+import { isPage, isoDate, slugOf } from '../lib/projects';
+import { url } from '../lib/url';
+
+interface Props { count?: number; title?: string }
+const { count = 3, title } = Astro.props;
+const projects = new Map((await getCollection('projects')).filter(isPage).map((p) => [slugOf(p), p]));
+const entries = (await getCollection('devlog'))
+  .filter((e) => projects.has(e.id.split('/')[0]))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, count);
+
+// Plain-text teaser from the entry's Markdown
+function teaser(md = '') {
+  const text = md
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[#>*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.length > 180 ? text.slice(0, 179).trimEnd() + '…' : text;
+}
+---
+{entries.length > 0 && (
+  <>
+    {title && <h2 id={title.toLowerCase().replace(/[^a-z0-9]+/g, '-')} class="section-heading">{title}</h2>}
+    <ol class="timeline">
+      {entries.map((e) => {
+        const [slug, ...rest] = e.id.split('/');
+        const project = projects.get(slug)!;
+        const entrySlug = rest.join('/');
+        return (
+          <li class="entry">
+            <div class="entry-date"><time datetime={isoDate(e.data.date)}>{isoDate(e.data.date)}</time></div>
+            <div class="entry-body">
+              <h3><a href={`${url(`/projects/${slug}/`)}#${entrySlug}`}>{e.data.title}</a></h3>
+              <span class="entry-subtitle">{project.data.title}</span>
+              <div class="entry-text">{teaser(e.body)}</div>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </>
+)}

@@ -1,9 +1,0 @@
-<div class="card card-static">
-{{ if or (.Get "type") (.Get "date") }}<span class="card-meta">{{ with .Get "type" }}<code class="chip">{{ . }}</code>{{ end }}{{ with .Get "date" }}<time>{{ . }}</time>{{ end }}</span>{{ end }}
-<span class="card-title">{{ .Get "title" }}</span>
-<div class="card-summary">
-
-{{ .Inner }}
-
-</div>
-</div>

@@ -1,0 +1,10 @@
+---
+// <Accordion title="Projects" open>content</Accordion>: a collapsible section (native <details>). Linking to /page/#projects, or to anything inside it, opens it.
+interface Props { title: string; open?: boolean }
+const { title, open = false } = Astro.props;
+const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+---
+<details class="accordion" id={id} open={open}>
+  <summary class="accordion-title"><span>{title}</span><svg class="accordion-caret" width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3.5l3 3 3-3" /></svg></summary>
+  <div class="accordion-body"><slot /></div>
+</details>

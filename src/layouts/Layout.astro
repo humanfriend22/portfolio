@@ -1,0 +1,70 @@
+---
+import '../styles/theme.css';
+import '../styles/base.css';
+import '../styles/components.css';
+import '../styles/transitions.css';
+import { site } from '../data/site';
+import { pathWithoutBase, url } from '../lib/url';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+interface Props { title?: string; description?: string }
+const { title, description } = Astro.props;
+const isHome = pathWithoutBase(Astro.url.pathname) === '/';
+---
+<!doctype html>
+<html lang={site.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{isHome || !title ? site.title : `${title} — ${site.title}`}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+    <link rel="icon" href={url('/favicon.ico')} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+  </head>
+  <body>
+    <Header />
+    <main class="wrap page"><slot /></main>
+    <dialog class="modal" aria-label="Project"><button class="modal-close" aria-label="Close">&times;</button><div class="modal-body page"></div></dialog>
+    <Footer />
+
+    <script>
+      // Cards marked data-modal open the project in a dialog on desktop; on mobile (or with a modifier key) they navigate normally.
+      const dialog = document.querySelector<HTMLDialogElement>('.modal')!;
+      const body = dialog.querySelector('.modal-body')!;
+      const desktop = window.matchMedia('(min-width: 768px)');
+
+      dialog.querySelector('.modal-close')!.addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+      document.addEventListener('click', (e) => {
+        const card = (e.target as Element).closest<HTMLAnchorElement>('a.card[data-modal]');
+        if (!card || !desktop.matches || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+        e.preventDefault();
+        fetch(card.href)
+          .then((r) => r.text())
+          .then((html) => {
+            const main = new DOMParser().parseFromString(html, 'text/html').querySelector('main')!;
+            body.innerHTML = main.innerHTML;
+            dialog.showModal();
+            dialog.scrollTop = 0;
+          })
+          .catch(() => { location.href = card.href; });
+      });
+    </script>
+
+    <script>
+      // Open the accordion that contains the linked section (#projects, #inch-cubed, ...)
+      function openTarget() {
+        const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        const details = el && el.closest('details');
+        if (details && !details.open) { details.open = true; el.scrollIntoView(); }
+      }
+      window.addEventListener('hashchange', openTarget);
+      openTarget();
+    </script>
+  </body>
+</html>

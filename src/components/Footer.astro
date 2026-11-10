@@ -1,0 +1,14 @@
+---
+import { site } from '../data/site';
+import { externalAttrs } from '../lib/external';
+import { pathWithoutBase, url } from '../lib/url';
+
+const isProjectPage = /^\/projects\/[^/]+\//.test(pathWithoutBase(Astro.url.pathname));
+---
+<footer class="site-footer wrap">
+  <hr />
+  <div class="footer-row">
+    {isProjectPage ? <a class="link" href={url('/projects/')}>← all projects</a> : <span>© {new Date().getFullYear()} {site.title}</span>}
+    <a class="link" href={site.github} {...externalAttrs(site.github)}>github.com/humanfriend22</a>
+  </div>
+</footer>

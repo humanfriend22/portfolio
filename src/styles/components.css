@@ -1,0 +1,208 @@
+/* Every component, from cards and timelines to the individual parts of the nav UI (header, mobile menu, footer). */
+
+/* ===== Site header and nav ===== */
+.site-header { padding-top: 12px; padding-bottom: 12px; font: 14px var(--mono); color: var(--dim); }
+.header-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.crumbs { min-height: var(--tap-size); display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; min-width: 0; }
+.crumbs .current, .site-header a.active { color: var(--ink); }
+
+.desktop-nav { display: none; flex-wrap: wrap; justify-content: flex-end; gap: 0 24px; }
+.desktop-nav a, .mobile-nav-grid a {
+  min-height: var(--tap-size); display: flex; align-items: center;
+  transition: color var(--hover-transition-duration);
+}
+.desktop-nav a:hover { color: var(--accent); }
+
+/* Dropdown: a menu entry with children (set `menu: main: parent: deda` on a sub page). Opens on hover or keyboard focus. */
+.nav-item { position: relative; }
+.nav-item > a { gap: 6px; }
+.nav-caret { opacity: 0.7; }
+.dropdown {
+  position: absolute; top: 100%; right: -12px; z-index: 10; min-width: 180px; padding: 6px;
+  display: none; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.nav-item:hover .dropdown, .nav-item:focus-within .dropdown { display: flex; }
+.dropdown a { min-height: 38px; padding: 0 10px; border-radius: var(--radius-sm); white-space: nowrap; }
+.dropdown a:hover { background: var(--chip); }
+
+.menu-button {
+  width: var(--tap-size); height: var(--tap-size); margin-right: -10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 0; border-radius: var(--radius-sm); color: var(--ink); cursor: pointer;
+  transition: color var(--hover-transition-duration);
+}
+.menu-button:hover { color: var(--accent); }
+.icon-close, .site-header[data-open] .icon-open { display: none; }
+.site-header[data-open] .icon-close { display: block; }
+
+/* Mobile menu: animate the real height with grid rows */
+.mobile-nav {
+  display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden;
+  transition: grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, visibility 0s 0.3s;
+}
+.site-header[data-open] .mobile-nav {
+  grid-template-rows: 1fr; opacity: 1; visibility: visible;
+  transition: grid-template-rows 0.45s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.35s ease 0.05s, visibility 0s;
+}
+.mobile-nav-clip { min-height: 0; overflow: hidden; }
+.mobile-nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-top: 8px; }
+.mobile-nav-grid a {
+  justify-content: center; padding: 0 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  transition: color var(--hover-transition-duration), border-color var(--hover-transition-duration);
+}
+.mobile-nav-grid a:hover { color: var(--accent); border-color: var(--accent); }
+.mobile-nav-grid a.active { color: var(--ink); border-color: var(--accent); }
+
+@media (min-width: 768px) {
+  .site-header { padding-top: 20px; padding-bottom: 20px; }
+  .desktop-nav { display: flex; }
+  .menu-button, .mobile-nav { display: none; }
+}
+
+/* Footer */
+.site-footer { margin-top: 64px; padding-bottom: 40px; }
+.site-footer hr { margin: 0 0 20px; border: 0; border-top: 1px solid var(--line); }
+.footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; min-height: var(--tap-size); font: 13px var(--mono); color: var(--dim); }
+.footer-row a { min-height: var(--tap-size); display: flex; align-items: center; }
+
+/* ===== Cards, layout shortcodes, media, timeline ===== */
+/* Cards (project cards, link cards, info cards) */
+.card-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+.card-grid-fixed { grid-template-columns: 1fr; }
+@media (min-width: 768px) { .card-grid-fixed { grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); } }
+.card-column { display: flex; flex-direction: column; gap: 16px; }
+.card {
+  display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  transition: border-color var(--hover-transition-duration);
+}
+a.card:hover { border-color: var(--accent); }
+.card-cover {
+  width: calc(100% + 40px); max-width: none; margin: -18px -20px 6px; aspect-ratio: 16 / 9; object-fit: cover;
+  border: 0 !important; border-bottom: 1px solid var(--line) !important; border-radius: 0 !important;
+}
+.card-title { font-size: 17px; font-weight: 600; color: var(--accent); }
+.card-summary { font-size: 15px; line-height: 1.55; color: var(--soft); text-wrap: pretty; }
+.card-summary p { margin: 0; }
+.card-meta { margin-top: auto; padding-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.card-featured { gap: 10px; padding: 22px 24px; }
+.card-featured .card-cover { width: calc(100% + 48px); margin: -22px -24px 8px; aspect-ratio: 21 / 9; }
+.card-featured .card-title { font-size: 20px; }
+.card-featured .card-summary { font-size: inherit; line-height: inherit; }
+
+/* Stack tags (partials/tag.html) */
+.tag {
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 6px; white-space: nowrap;
+  font: 12px/1.5 var(--mono); color: var(--ink); border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.tag svg { flex: none; color: var(--accent); }
+
+/* Layout shortcodes */
+.columns { display: grid; grid-template-columns: 1fr; gap: 24px 32px; }
+@media (min-width: 768px) { .columns { grid-template-columns: var(--tracks, repeat(var(--cols, 2), minmax(0, 1fr))); } }
+.column { min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+.column > :first-child { margin-top: 0 !important; }
+/* Row: children side by side in equal columns, stacked on mobile. A paragraph of consecutive images dissolves so each image is a cell. */
+.row { display: flex; flex-direction: column; gap: 16px 24px; }
+.row > *, .row > p:has(img) > img { min-width: 0; margin: 0; }
+.row > p:has(img) { display: contents; }
+.row img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: var(--radius-sm); }
+@media (min-width: 768px) { .row { flex-direction: row; align-items: flex-start; } .row > *, .row > p:has(img) > img { flex: 1 1 0; } }
+
+/* Media: text and image side by side, stacked on small screens */
+.media { display: grid; grid-template-columns: 1fr; gap: 16px 32px; align-items: start; }
+.media-figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.media-figure figcaption { font: 13px var(--mono); color: var(--dim); }
+.media-text { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+@media (min-width: 768px) {
+  .media:has(.media-figure) { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+  .media[data-side='right']:has(.media-figure) { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+  .media[data-side='right'] .media-figure { order: 2; }
+}
+
+/* Timeline (guest speakers, devlog) */
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline > li:last-child { border-bottom: 1px solid var(--line); }
+.entry {
+  display: grid; gap: 8px 32px; padding: 28px 0; border-top: 1px solid var(--line); scroll-margin-top: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+}
+.entry-date { font: 13px var(--mono); color: var(--dim); }
+.entry-body { grid-column: span 3; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.entry-subtitle { font: 13px var(--mono); color: var(--dim); }
+.entry-text { margin-top: 8px; display: flex; flex-direction: column; gap: 14px; }
+
+/* Project page header */
+.project-meta { margin-top: -8px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font: 14px var(--mono); color: var(--dim); }
+.project-meta a { min-height: var(--tap-size); display: inline-flex; align-items: center; }
+#devlog ~ .timeline .entry h3 { font-size: 24px; letter-spacing: -0.01em; }
+
+/* Guest speakers (timeline-entry shortcode): photo beside the text, date at the top right */
+.entry-person { grid-template-columns: 1fr; align-items: start; }
+.entry-person .entry-body { grid-column: auto; }
+.entry-image { display: block; width: 100%; height: auto; border-radius: var(--radius-sm); }
+.entry-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 16px; }
+.entry-head .entry-date { margin-left: auto; white-space: nowrap; }
+@media (min-width: 768px) { .entry-person { grid-template-columns: minmax(0, 2fr) minmax(0, 5fr); gap: 28px; } }
+
+/* Project modal (desktop only; the dialog is never opened on mobile) */
+.modal {
+  width: min(760px, calc(100% - 48px)); max-height: calc(100vh - 64px); padding: 0; overflow-y: auto;
+  color: var(--ink); background: var(--ground); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.modal::backdrop { background: rgb(0 0 0 / 0.55); }
+.modal-body { padding: 8px 32px 32px; }
+.modal-close {
+  position: sticky; top: 0; float: right; margin: 8px 8px 0 0; padding: 0 10px; font-size: 24px; line-height: 1.4;
+  color: var(--soft); background: none; border: 0; cursor: pointer;
+}
+.modal-close:hover { color: var(--accent); }
+
+/* Inline project sections (projects shortcode, format="sections") */
+.project-sections { display: grid; grid-template-columns: 1fr; gap: 56px 32px; }
+@media (min-width: 768px) { .project-sections { grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); } }
+.project-section {
+  min-width: 0; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 24px; padding: 20px 22px 24px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.project-section-media { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.project-section-image { display: block; width: 100%; height: auto; border-radius: var(--radius-sm); }
+.project-section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 16px; }
+.project-section-date { margin-left: auto; font: 13px var(--mono); color: var(--dim); white-space: nowrap; }
+.project-section-title { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+.project-section .project-meta { margin-top: 0; }
+.project-section-body { display: flex; flex-direction: column; gap: 14px; }
+.project-section-body > :first-child { margin-top: 0; }
+.project-section-body :is(h2, h3, h4) { margin: 8px 0 0; font-size: 16px; }
+
+/* Alternating projects: image beside the text, top-aligned, sides swap every row (stacked on mobile) */
+.project-section-text { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 768px) {
+  .project-alt:has(.project-section-media) { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 28px; align-items: start; }
+  .project-alt:nth-child(even):has(.project-section-media) { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); }
+  .project-alt:nth-child(even) .project-section-media { order: 2; }
+}
+
+/* No indent by default. Put {.indent} on the line after a paragraph to indent its first line, or {.indent-block} to push the whole block in. */
+.page p.indent { text-indent: 2em; }
+.indent-block { padding-left: 2em; }
+
+/* Accordion (accordion shortcode): a collapsible section styled like an h2 */
+.accordion { border-bottom: 1px solid var(--line); scroll-margin-top: 24px; }
+.accordion-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: var(--tap-size); padding: 10px 0;
+  font-size: 24px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: var(--accent-2);
+  cursor: pointer; list-style: none; transition: color var(--hover-transition-duration);
+}
+.accordion-title::-webkit-details-marker { display: none; }
+.accordion-title:hover { color: var(--accent); }
+.accordion-caret { flex: none; transition: transform 0.2s ease; }
+.accordion[open] .accordion-caret { transform: rotate(180deg); }
+.accordion-body { display: flex; flex-direction: column; gap: 24px; padding: 8px 0 32px; }
+
+/* Image list under a project's first image (project `image` front matter list) */
+.gallery { display: flex; flex-direction: column; gap: 12px; }
+.gallery img { width: 100%; height: auto; }

@@ -1,0 +1,31 @@
+---
+// <Projects folder="deda" format="alternating" cols={2} image="top" title="Projects" />
+//   folder / ids / exclude: which projects (same as ProjectCards)
+//   format: sections (full write-up inline, default) | alternating (one per row, image and text swap sides) | cards (linked cards)
+//   cols: projects per row on desktop (sections format, default 1)
+//   image: top (default) | none
+import { isPage, listProjects, type List } from '../lib/projects';
+import ProjectCard from './ProjectCard.astro';
+import ProjectSection from './ProjectSection.astro';
+
+interface Props {
+  ids?: List; folder?: List; exclude?: List; title?: string;
+  format?: 'sections' | 'alternating' | 'cards'; cols?: number; image?: 'top' | 'none';
+}
+const { ids, folder, exclude, title, format = 'sections', cols = 1, image = 'top' } = Astro.props;
+const list = await listProjects({ ids, folder, exclude });
+const slug = title?.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const alt = format === 'alternating';
+---
+{list.length > 0 && (
+  <>
+    {title && <h2 id={slug} class="section-heading">{title}</h2>}
+    {format === 'cards' ? (
+      <div class="card-grid">{list.filter(isPage).map((p) => <ProjectCard project={p} />)}</div>
+    ) : (
+      <div class:list={['project-sections', { 'project-sections-alt': alt }]} style={`--cols:${alt ? 1 : cols}`}>
+        {list.map((p) => <ProjectSection project={p} {image} alternate={alt} />)}
+      </div>
+    )}
+  </>
+)}

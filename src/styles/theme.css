@@ -1,0 +1,36 @@
+/*
+ * Theme variables: every color, font, size, and timing used elsewhere comes from here.
+ * Retheme the site by editing this file only. Load order is set in layouts/_default/baseof.html.
+ */
+:root {
+  /* Surfaces */
+  --ground: #181816;   /* page background */
+  --surface: #1f1f1d;  /* cards, mobile menu buttons */
+  --chip: #2a2a27;     /* inline code, chips */
+  --code: #0b0b0b;     /* code blocks */
+  --line: #33322f;    /* borders and dividers */
+
+  /* Text */
+  --ink: #d0cdc5;      /* primary text */
+  --soft: #aeaba3;     /* secondary text */
+  --dim: #94928a;      /* tertiary text: dates, meta, nav */
+
+  /* Accent and blockquote */
+  --accent: #e3a04b;      /* links, interactive */
+  --accent-2: #86b5a6;    /* calm sage for headings and titles */
+  --accent-line: #6b5a3e;  /* underlines under links */
+  --quote: #3a3835;        /* blockquote left border */
+
+  /* Type */
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Layout */
+  --page: 1120px;
+  --tap-size: 44px;      /* minimum touch target */
+  --radius-sm: 4px;
+  --radius: 6px;
+
+  /* Motion */
+  --hover-transition-duration: 0.15s;  /* every hover color/border change */
+}
