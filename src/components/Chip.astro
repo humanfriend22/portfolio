@@ -1,3 +1,5 @@
 ---
+interface Props { class?: string }
+const { class: className } = Astro.props;
 ---
-<span class="chip"><slot /></span>
+<span class:list={['chip', className]}><slot /></span>

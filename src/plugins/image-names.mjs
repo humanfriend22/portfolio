@@ -1,6 +1,7 @@
 // Sätteri mdast plugin: `![alt](mentor1)` finds mentor1.* next to the file, in its images/ folder, or in src/content/images/,
 // then rewrites the URL to a relative path so Astro optimizes it like any local image.
 // `![alt](mentor1?bottom=25&left=10)` also cuts those percentages off first (top/bottom/left/right).
+// Images on consecutive lines (no blank line between) become one row: same height, widths follow each image's shape, no cropping.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, statSync } from 'node:fs';
 import { basename, dirname, extname, relative } from 'node:path';
@@ -30,18 +31,48 @@ function crop(root, file, q) {
   return out;
 }
 
+const SIZE = `
+import sharp from 'sharp';
+const { width, height } = await sharp(process.argv[1]).metadata();
+console.log(width / height);
+`;
+const ratios = new Map();
+const ratio = (file) => {
+  if (!ratios.has(file)) ratios.set(file, Number(execFileSync(process.execPath, ['--input-type=module', '-e', SIZE, file], { encoding: 'utf8' })));
+  return ratios.get(file);
+};
+
+// Absolute path of the (cropped) file a markdown image name points at, or undefined for URLs and unknown names
+function localFile(url, ctx) {
+  if (!url || /^([a-z]+:|\/|\.\.)/i.test(url) || !ctx.fileURL) return;
+  const [name, query = ''] = url.split('?');
+  const file = fileURLToPath(ctx.fileURL);
+  const root = process.cwd();
+  const hit = imageCandidates(name, dirname(relative(root, file))).find((c) => /\.\w+$/.test(c) && existsSync(`${root}/${c}`));
+  if (!hit) return;
+  return crop(root, `${root}/${hit}`, new URLSearchParams(query));
+}
+
+const relUrl = (out, ctx) => {
+  const rel = relative(dirname(fileURLToPath(ctx.fileURL)), out);
+  return rel.startsWith('.') ? rel : `./${rel}`;
+};
+
 export const imageNames = {
   name: 'image-names',
   image(node, ctx) {
-    const url = node.url;
-    if (!url || /^([a-z]+:|\/|\.\.)/i.test(url) || !ctx.fileURL) return;
-    const [name, query = ''] = url.split('?');
-    const file = fileURLToPath(ctx.fileURL);
-    const root = process.cwd();
-    const dir = dirname(relative(root, file));
-    const hit = imageCandidates(name, dir).find((c) => /\.\w+$/.test(c) && existsSync(`${root}/${c}`));
-    if (!hit) return;
-    const rel = relative(dirname(file), crop(root, `${root}/${hit}`, new URLSearchParams(query)));
-    ctx.setProperty(node, 'url', rel.startsWith('.') ? rel : `./${rel}`);
+    const out = localFile(node.url, ctx);
+    if (!out) return;
+    ctx.setProperty(node, 'url', relUrl(out, ctx));
+  },
+  // two or more images in one paragraph: a row whose images all share a height (each grows in proportion to its aspect ratio)
+  paragraph(node, ctx) {
+    const images = node.children.filter((c) => c.type === 'image');
+    const onlyImages = node.children.every((c) => c.type === 'image' || c.type === 'break' || (c.type === 'text' && !c.value.trim()));
+    if (images.length < 2 || !onlyImages) return;
+    const files = images.map((img) => localFile(img.url, ctx));
+    if (files.some((f) => !f)) return;
+    const sized = images.map((img, i) => ({ ...img, url: relUrl(files[i], ctx), data: { hProperties: { style: `--ar:${ratio(files[i]).toFixed(4)}` } } }));
+    ctx.replaceNode(node, { type: 'layout', data: { hName: 'div', hProperties: { className: ['image-row'] } }, children: sized });
   },
 };

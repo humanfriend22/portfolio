@@ -132,6 +132,14 @@ a.card:hover { border-color: var(--accent); }
 .layout-grid > p:has(img) { display: contents; }
 .layout-grid > p > img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: var(--radius-sm); }
 
+/* Consecutive images in markdown (see plugins/image-names.mjs): one row, one shared height. --ar is each image's width / height */
+.image-row { display: flex; gap: 16px; margin-block: 16px; }
+.image-row > img { flex: var(--ar) 1 0; min-width: 0; height: auto; margin: 0; border-radius: var(--radius-sm); }
+/* A lone image on its own line gets the same 16px above and below, so every gap between images matches the row gap */
+.page p:has(> img:only-child) { margin-block: 16px; }
+.page p > img:only-child { margin: 0; }
+@media (max-width: 767px) { .image-row { flex-direction: column; } .image-row > img { flex: none; width: 100%; } }
+
 /* Project page header */
 .project-meta { margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font: 14px var(--mono); color: var(--dim); }
 .project-meta a { min-height: var(--tap-size); display: inline-flex; align-items: center; }
@@ -159,9 +167,11 @@ a.card:hover { border-color: var(--accent); }
 /* First-line indent comes from the --indent variable: `indent: true` in front matter sets it on the page (or inline project), and a
    <Card indent> / <Card indent={false}> overrides it for that card. Variables inherit, so everything inside follows. */
 :where(.page p) { text-indent: var(--indent, 0); }
-.no-indent { text-indent: 0; }
+.no-indent, .page :is(h1, h2, h3, h4, h5, h6) + p { text-indent: 0; }
 
-/* No indent by default. Put {.indent} on the line after a paragraph to indent its first line, or {.indent-block} to push the whole block in. */
+/* No indent by default. Put {.indent} on the line after a paragraph to indent its first line, or {.indent-block} to push the whole block in.
+   .indent also works on a wrapper (<div class="indent">): it sets --indent, so every paragraph inside is indented. */
+.page .indent { --indent: 2em; }
 .page p.indent { text-indent: 2em; }
 .indent-block { padding-left: 2em; }
 

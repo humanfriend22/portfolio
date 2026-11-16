@@ -7,6 +7,7 @@
 //   align: vertical (image on top, default) | horizontal (image beside the text on desktop)   side: right puts that image after the text
 //   bare: no box around it (plain image + text)   prose: the body is long-form text, shown at normal size with headings and lists
 //   indent: indent the first line of the body's paragraphs (true) or not (false). Left out, it follows the page's `indent`.
+//   class: extra CSS classes on the card.
 //   The text between the tags is the body (Markdown works). Put cards inside <Grid cols={2}> to lay them out.
 import { Image } from 'astro:assets';
 import { findImage, imgProps, type Pic } from '../lib/images';
@@ -19,11 +20,11 @@ import Tag from './Tag.astro';
 interface Props {
   title?: string; id?: string; href?: string; image?: string | Pic | (string | Pic)[]; date?: string | Date; subtitle?: string;
   links?: { text: string; href: string }[]; tags?: string[]; align?: 'vertical' | 'horizontal'; side?: 'left' | 'right';
-  bare?: boolean; prose?: boolean; featured?: boolean; modal?: boolean; indent?: boolean;
+  bare?: boolean; prose?: boolean; featured?: boolean; modal?: boolean; indent?: boolean; class?: string;
 }
 const {
   title, id, href, image, date, subtitle, links = [], tags = [], align = 'vertical', side = 'left',
-  bare = false, prose = false, featured = false, modal = false, indent,
+  bare = false, prose = false, featured = false, modal = false, indent, class: className,
 } = Astro.props;
 
 const pics = [image ?? []].flat().map((i) => (typeof i === 'string' ? findImage(i) : i));
@@ -35,7 +36,7 @@ const link = href ? { href: url(href), ...externalAttrs(href) } : {};
 const Root = href ? 'a' : 'div';
 const hasBody = Astro.slots.has('default');
 ---
-<Root id={id} class:list={['card', { 'not-prose': !prose || href, 'card-featured': featured, 'card-horizontal': align === 'horizontal', 'card-bare': bare }]} {...link} data-side={side} data-modal={modal ? '' : undefined} style={indent === undefined ? undefined : `--indent:${indent ? '2em' : '0'}`}>
+<Root id={id} class:list={['card', { 'not-prose': !prose || href, 'card-featured': featured, 'card-horizontal': align === 'horizontal', 'card-bare': bare }, className]} {...link} data-side={side} data-modal={modal ? '' : undefined} style={indent === undefined ? undefined : `--indent:${indent ? '2em' : '0'}`}>
   {cover && (
     <div class="card-media not-prose">
       <Image class="card-cover" {...imgProps(cover)} alt={title ?? ''} widths={[400, 800]} sizes="(min-width: 768px) 400px, 100vw" />

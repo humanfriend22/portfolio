@@ -2,6 +2,7 @@
 title: "Wetlands Rover"
 course: "Computer Integrated Manufacturing"
 image: "wetlands-brainstorm"
+
 start: "3/31/2026"
 end: "5/23/2026"
 indent: true

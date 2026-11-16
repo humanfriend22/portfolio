@@ -66,7 +66,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outlin
 /* Text */
 .prose :where(p) { text-wrap: pretty; }
 .prose :where(a):not(:where(.not-prose, .not-prose *)) {
-  font-weight: inherit; text-underline-offset: 3px; text-decoration-color: var(--accent-line);
+  font-weight: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent-line);
   transition: color var(--hover-transition-duration);
 }
 .prose :where(a):not(:where(.not-prose, .not-prose *)):hover { color: var(--accent); }
